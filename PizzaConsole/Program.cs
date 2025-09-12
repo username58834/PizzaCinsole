@@ -65,7 +65,7 @@ namespace PizzaConsole
                     }
                     else if (command < Enum.GetValues(typeof(Ingredients)).Length)
                     {
-                        pizza.ChangeIngredients(command);
+                        pizza.ChangeIngredients((Ingredients)(command));
                     }
                     else
                     {
@@ -95,19 +95,19 @@ namespace PizzaConsole
                 }
 
                 Console.WriteLine("Enter  price:");
-                price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
-                while (price <= 0)
+                price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
+                while (price <= 0 || price >= 10000)
                 {
                     Console.WriteLine("Only numbers are allowed. The price must be greater than 0");
-                    price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
+                    price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
                 }
 
                 Console.WriteLine("Enter  weight:");
                 weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$",  "Only numbers are allowed. The price must be greater than 0"));
-                while (weight <= 0)
+                while (weight <= 0 || weight >= 10)
                 {
-                    Console.WriteLine("Only numbers are allowed. The weight must be greater than 0");
-                    weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The weight must be greater than 0"));
+                    Console.WriteLine("Only numbers are allowed. The weight must be greater than 0 and less than 10");
+                    weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The weight must be greater than 0 and less than 10"));
                 }
                 
                 PizzaClass pizza = new PizzaClass(name, price, weight);
@@ -136,6 +136,7 @@ namespace PizzaConsole
             foreach(PizzaClass pizza in pizzas)
             {
                 //Console.WriteLine($"{i}: {pizzas[i].Name}");
+                //pizza.ChangeState();
                 Console.WriteLine($"{pizza.Show()}");
             }
         }
@@ -258,7 +259,7 @@ namespace PizzaConsole
                     command = int.Parse(Console.ReadLine());
                     if (command < 0 || command >= pizzas.Count)
                     {
-                        throw new Exception($"Write a number netween {0} and {pizzas.Count}");
+                        throw new Exception($"Write a number netween {0} and {pizzas.Count-1}");
                     }
                     else
                     {
@@ -358,7 +359,7 @@ namespace PizzaConsole
                             return;
                         case 1:
                             if (pizzas.Count < N) Add();
-                            else throw new Exception("You have already reach the limit");
+                            else throw new Exception("You have already reached the limit");
                             break;
                         case 2:
                             ShowAll();
@@ -370,14 +371,32 @@ namespace PizzaConsole
                         case 4:
                             if (pizzas.Count > 0)
                             {
-                                if(pizzas[GetIndex()].Sell(ref money))
+                                for (int i=0;i< pizzas.Count;i++)
                                 {
-                                    Console.WriteLine($"The pizza was bought. Money left {money}");
+                                    pizzas[i].ChangeState();
+                                    Console.Write($"{(pizzas[i].State == States.Spoiled ? "" : $"{i}: ")} {pizzas[i].Name} Status -> {pizzas[i].State}");
+                                    if (pizzas[i].ThrowAwayIfSpoiled())
+                                    {
+                                        pizzas.RemoveAt(i);
+                                        i--;
+                                        Console.WriteLine(" -> The pizza was thrown away\n");
+                                    }
+                                    else Console.WriteLine(" -> Everything is good\n");
                                 }
-                                else
+
+                                if (pizzas.Count > 0)
                                 {
-                                    Console.WriteLine($"Not enough money. Money left {money}");
+                                    Console.WriteLine("To buy a pizza ");
+                                    if (pizzas[GetIndex()].Sell(ref money))
+                                    {
+                                        Console.WriteLine($"The pizza was bought. Money left {money}");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Not enough money. Money left {money}");
+                                    }
                                 }
+                                else Console.WriteLine("No fresh pizzas left");
                             }
                             else
                             {
