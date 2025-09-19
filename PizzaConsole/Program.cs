@@ -5,12 +5,13 @@ using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PizzaConsole
 {
     internal class Program
     {
-        static internal List<PizzaClass> pizzas = new List<PizzaClass>(); 
+        static internal List<PizzaClass> pizzas = new List<PizzaClass>();
         static void DrawMenu()
         {
             Console.WriteLine(
@@ -28,7 +29,7 @@ namespace PizzaConsole
         static string FormatAnswer(string regex, string message)
         {
             string text = "";
-            
+
             try
             {
                 text = Console.ReadLine();
@@ -52,15 +53,13 @@ namespace PizzaConsole
             {
                 try
                 {
-                    //Console.Clear();
                     Console.WriteLine("\nTo change ingredients write their number\n\n" +
                         $"{pizza.ShowIngredientsOnly()}" +
                         "0 - Add and close\n");
-                    
+
                     command = int.Parse(Console.ReadLine());
                     if (command == 0)
                     {
-                        //Console.Clear();
                         break;
                     }
                     else if (command < Enum.GetValues(typeof(Ingredients)).Length)
@@ -83,47 +82,98 @@ namespace PizzaConsole
             string name;
             float price;
             double weight;
+            PizzaClass pizza = new PizzaClass();
 
-            try
-            {
-                Console.WriteLine("Enter  name:");
-                name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
-                while (name.Length < 3 || name.Length > 12)
+            
+            Console.WriteLine("Enter  name:");
+            
+            while (true) {
+                try
                 {
-                    Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
-                    name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
+                    pizza.Name = Console.ReadLine();
+                    break;
                 }
-
-                Console.WriteLine("Enter  price:");
-                price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
-                while (price <= 0 || price >= 10000)
+                catch (ArgumentNullException ex)
                 {
-                    Console.WriteLine("Only numbers are allowed. The price must be greater than 0");
-                    price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
+                    Console.WriteLine(ex.Message);
                 }
-
-                Console.WriteLine("Enter  weight:");
-                weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$",  "Only numbers are allowed. The price must be greater than 0"));
-                while (weight <= 0 || weight >= 10)
+            } 
+            Console.WriteLine("Enter  price:");
+            
+            while (true) {
+                bool res;
+                do
                 {
-                    Console.WriteLine("Only numbers are allowed. The weight must be greater than 0 and less than 10");
-                    weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The weight must be greater than 0 and less than 10"));
+                    res = float.TryParse(Console.ReadLine(), out price);
+                    if (!res) Console.WriteLine("Write a number");
+                } while (!res);
+                try
+                {
+                    
+                    pizza.Price = price;
+                    break;
                 }
-                
-                PizzaClass pizza = new PizzaClass(name, price, weight);
-                ChooseIngredients(ref pizza);
-                pizzas.Add(pizza);
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-            catch(Exception ex)
+
+            Console.WriteLine("Enter  weight:");
+            while (true)
             {
-                Console.WriteLine(ex.Message);
-            }            
+                bool res;
+                do
+                {
+                    res = double.TryParse(Console.ReadLine(), out weight);
+                    if (!res) Console.WriteLine("Write a number");
+                } while (!res);
+                try
+                {
+
+                    pizza.Weight = weight;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            //name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
+            /*while (name.Length < 3 || name.Length > 12)
+            {
+                name =
+                //Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
+                //name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
+            }*/
+            /*
+            
+            price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
+            while (price <= 0 || price >= 10000)
+            {
+                Console.WriteLine("Only numbers are allowed. The price must be greater than 0 and less than 10000");
+                price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
+            }
+
+            Console.WriteLine("Enter  weight:");
+            weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The price must be greater than 0"));
+            while (weight <= 0 || weight >= 10)
+            {
+                Console.WriteLine("Only numbers are allowed. The weight must be greater than 0 and less than 10");
+                weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The weight must be greater than 0 and less than 10"));
+            }
+
+            */
+            ChooseIngredients(ref pizza);
+            pizzas.Add(pizza);
+            
+            
         }
 
         static void ShowAll()
         {
             Console.WriteLine($"You have {pizzas.Count} pizzas");
-            for(int i = 0; i < pizzas.Count; i++)
+            for (int i = 0; i < pizzas.Count; i++)
             {
                 Console.WriteLine($"{i}: {pizzas[i].Name}");
                 //Console.WriteLine($"{pizzas[i].Show}")
@@ -133,16 +183,14 @@ namespace PizzaConsole
         static void ShowAllDetailed()
         {
             Console.WriteLine($"You have {pizzas.Count} pizzas");
-            foreach(PizzaClass pizza in pizzas)
+            foreach (PizzaClass pizza in pizzas)
             {
-                //Console.WriteLine($"{i}: {pizzas[i].Name}");
-                //pizza.ChangeState();
                 Console.WriteLine($"{pizza.Show()}");
             }
         }
         static void Find()
         {
-            Console.WriteLine("Choose type of sratching\n0 - Search by name\n1 - Search by maximum price");
+            Console.WriteLine("Choose type of searching\n0 - Search by name\n1 - Search by maximum price");
             int command = 2;
             string name;
             float price;
@@ -162,57 +210,54 @@ namespace PizzaConsole
 
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
-            //while (true)
-            //{
-                try
+            
+            try
+            {
+                if (command == 0)
                 {
-                    if (command == 0)
+                    Console.WriteLine("Enter  name:");
+                    name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
+                    while (name.Length < 3 || name.Length > 12)
                     {
-                        Console.WriteLine("Enter  name:");
+                        Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
                         name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
-                        while (name.Length < 3 || name.Length > 12)
-                        {
-                            Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
-                            name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
-                        }
-
-                        foreach (PizzaClass pizza in pizzas)
-                        {
-                            if (pizza.Name == name)
-                            {
-                                Console.WriteLine($"\n{pizza.Show()}");
-                                was = true;
-                            }
-                        }
                     }
-                    else if (command == 1)
+
+                    foreach (PizzaClass pizza in pizzas)
                     {
-                        Console.WriteLine("Enter  maximum price:");
-                        price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
-                        while (price <= 0)
+                        if (pizza.Name == name)
                         {
-                            Console.WriteLine("Only numbers are allowed. The price must be greater than 0");
-                            price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
-                        }
-
-                        foreach (PizzaClass pizza in pizzas)
-                        {
-                            if (pizza.Price <= price)
-                            {
-                                Console.WriteLine($"\n{pizza.Show()}");
-                                was = true;
-                            }
+                            Console.WriteLine($"\n{pizza.Show()}");
+                            was = true;
                         }
                     }
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
-
-                if (!was)
+                else if (command == 1)
                 {
-                    Console.WriteLine("\nNo items found");
+                    Console.WriteLine("Enter  maximum price:");
+                    price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
+                    while (price <= 0)
+                    {
+                        Console.WriteLine("Only numbers are allowed. The price must be greater than 0");
+                        price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
+                    }
+
+                    foreach (PizzaClass pizza in pizzas)
+                    {
+                        if (pizza.Price <= price)
+                        {
+                            Console.WriteLine($"\n{pizza.Show()}");
+                            was = true;
+                        }
+                    }
                 }
-                //break;
-            //}
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+            if (!was)
+            {
+                Console.WriteLine("\nNo items found");
+            }
         }
 
         static void Delete()
@@ -251,7 +296,7 @@ namespace PizzaConsole
         static int GetIndex()
         {
             int command;
-            Console.WriteLine($"Write a number netween {0} and {pizzas.Count-1}");
+            Console.WriteLine($"Write a number netween {0} and {pizzas.Count - 1}");
             while (true)
             {
                 try
@@ -259,7 +304,7 @@ namespace PizzaConsole
                     command = int.Parse(Console.ReadLine());
                     if (command < 0 || command >= pizzas.Count)
                     {
-                        throw new Exception($"Write a number netween {0} and {pizzas.Count-1}");
+                        throw new Exception($"Write a number netween {0} and {pizzas.Count - 1}");
                     }
                     else
                     {
@@ -287,10 +332,10 @@ namespace PizzaConsole
                     Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
                     name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
                 }
-            }catch (Exception ex) { Console.WriteLine(ex.Message); }
+            } catch (Exception ex) { Console.WriteLine(ex.Message); }
 
             bool was = false;
-            for(int i = 0; i < pizzas.Count; i++)
+            for (int i = 0; i < pizzas.Count; i++)
             {
                 if (name == pizzas[i].Name)
                 {
@@ -299,58 +344,39 @@ namespace PizzaConsole
                     was = true;
                 }
             }
-            if (was) Console.WriteLine("The itens were successfully deleted");
+            if (was) Console.WriteLine("The items were successfully deleted");
             else Console.WriteLine("Nothing to delete");
         }
 
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            //DrawMenu();
+
             int command;
             int N = 0;
             float money = 0;
+            string text = "";
 
-            Console.WriteLine("Write maximum number of elements");
-            while (true)
-            {
-                try
-                {
-                    N = int.Parse(Console.ReadLine());
-                    if (N <= 0) throw new Exception("Write a number greater than 0\n");
-                    else break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+            Console.WriteLine("Write maximum number of elements:");
+
+            while (!int.TryParse(Console.ReadLine(), out N) || N <= 0) {
+
+                Console.WriteLine("Write a number greater than 0.\n");
             }
 
-            //while (true)
-            //{
-            try
+            Console.WriteLine("Enter  money:");
+
+            while (!float.TryParse(Console.ReadLine(), out money) || !Regex.IsMatch(money.ToString(), @"^(0|[1-9]\d*)(\.\d{0,2})?$") || money <= 0)
             {
-                Console.WriteLine("Enter  money:");
-                money = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
-                while (money <= 0)
-                {
-                    Console.WriteLine("Only numbers are allowed. The price must be greater than 0");
-                    money = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0"));
-                }
+                Console.WriteLine("Only numbers are allowed. The amount of money must be greater than 0.\nFormat: any digits before the decimal point, and up to 2 digits after it.");
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            //}
 
             while (true)
             {
                 try
                 {
-                    //Console.WriteLine("\nMenu was omitted");
                     DrawMenu();
-                    Console.WriteLine("\nEnter a number between 0-5");
+                    Console.WriteLine($"\nYou have {money.ToString("F2")}$\nEnter a number between 0-5");
 
                     command = int.Parse(Console.ReadLine());
                     switch (command)
@@ -362,8 +388,8 @@ namespace PizzaConsole
                             else throw new Exception("You have already reached the limit");
                             break;
                         case 2:
-                            ShowAll();
-                            //ShowAllDetailed();
+                            //ShowAll();
+                            ShowAllDetailed();
                             break;
                         case 3:
                             Find();

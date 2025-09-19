@@ -1,32 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="PizzaConsole.PizzaClass">
-    <Position X="1" Y="0.75" Width="1.5" />
+    <Position X="4.25" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAQAAAAAAIAAAAAQAACAEAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAABgAAAAQQABAAAYAAAAASAACAEQAAkACAABAAhAAA=</HashCode>
       <FileName>PizzaClass.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="PizzaConsole.IngredientClass">
-    <Position X="4.75" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAIAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>IngredientClass.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="PizzaConsole.Program">
-    <Position X="3" Y="2.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAIAAAAAAAAAAAAAAAEAIAAAAAAAAAAAAAABBAAAAAA=</HashCode>
-      <FileName>Program.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Enum Name="Ingredients">
-    <Position X="6.75" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAQAAAAAAEgAEAQABEAAIAAAAAQAAAAAAAAUA=</HashCode>
-      <FileName>Ingredients.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

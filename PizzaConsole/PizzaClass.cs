@@ -27,14 +27,11 @@ namespace PizzaConsole
             }
             set
             {
-                if (!Regex.IsMatch(value, "^[A-Za-z ]*$") || name.Length < 3 || name.Length > 12)
+                if (!Regex.IsMatch(value, "^[A-Za-z ]*$") || value.Length < 3 || value.Length > 12)
                 {
                     throw new ArgumentNullException(null, "Write from 3 to 12 characters. Only Latin letters are allowed");
                 }
-                else
-                {
-                    name = value;
-                }
+                name = value; 
             }
         }
 
@@ -46,14 +43,11 @@ namespace PizzaConsole
             }
             set
             {
-                if (!Regex.IsMatch(value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,2})?$") || value <= 0 || value >= 10000)
+                if (value <= 0 || value >= 10000)//!Regex.IsMatch( value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,2})?$") ||
                 {
                     throw new ArgumentNullException(null, "Only numbers are allowed. The price must be greater than 0 and less than 10000");
                 }
-                else
-                {
-                    price = value;
-                }
+                price = value;
             }
         }
 
@@ -65,7 +59,7 @@ namespace PizzaConsole
             }
             set
             {
-                if (!Regex.IsMatch(value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,3})?$") || value <= 0 || value >= 10)
+                if (value <= 0 || value >= 10)//!Regex.IsMatch(value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,3})?$") ||
                 {
                     throw new ArgumentNullException(null, "Only numbers are allowed. The weight must be greater than 0 and less than 10");
                 }
@@ -90,23 +84,15 @@ namespace PizzaConsole
 
         public void ChangeState(){
             double time = (DateTime.Now - bakingDate).TotalSeconds;
-            switch (State)
+            
+            if (State == States.Baking && time >= bakingTime)
             {
-                case States.Baking:
-                    if (time >= bakingTime)
-                    {
-                        State = States.Ready;
-                    }
-                    break;
-                case States.Ready: 
-                    if(time >= bakingTime + freshTime)
-                    {
-                        State = States.Spoiled;
-                    }
-                    break;
-                default:
-                    break;
-            }
+                State = States.Ready;
+            }    
+            if (State == States.Ready && time >= bakingTime + freshTime)
+            {
+                State = States.Spoiled;
+            }            
         }
 
         public bool ThrowAwayIfSpoiled()
@@ -118,12 +104,8 @@ namespace PizzaConsole
             return false;
         }
 
-        public PizzaClass(string name = "None", float price = 0, double weight = 0)
+        public PizzaClass()
         {   
-            this.name = name;
-            this.price = price;
-            this.weight = weight;
-
             ingredients.Add(Ingredients.Dough);
         }
         public void ChangeIngredients(Ingredients ingredient)
@@ -161,44 +143,46 @@ namespace PizzaConsole
                 text += $"| {ingredients.Contains((Ingredients)(i))} ";
                 if (ingredients.Contains((Ingredients)(i))) text += " ";
                 text += "|\n";
-                //text += $"{i}: {((Ingredients)(i)).ToString()} - {ingredients.Contains((Ingredients)(i))}\n";
-                //text += $"{i}: {((Ingredients)(i)).ToString()} - {ingredients.Contains((Ingredients)(i))}\n";
-                //!text += $"{i}: {ingredients[i]} - {ingredients[i].IsChoosen}\n";
+   
                 text += $" ---------------------------\n";              
             }           
 
             return text;
         }
+
+        private string AddSpaces(string text, int max_length)
+        {
+            while(text.Length < max_length)
+            {
+                text += " ";
+            }
+            return text;
+        }
         public string Show()
         {
             ChangeState();
+            double time = (DateTime.Now - bakingDate).TotalSeconds;
 
-            string text = 
-                $"Name:       {Name}\n" +
-                $"Price:      {Price.ToString("F2")}$\n" +
-                $"Weight:     {Weight.ToString("F3")}kg\n" +
-                $"BakingDate: {bakingDate}\n" +
-                $"BakingTime: {bakingTime}\n" +
-                $"FreshTime:  {freshTime}\n" +
-                $"Status:     {State}\n" +
-                $"Ingredients:\n";
+            string text =
+                $" -----------------------------------\n" +
+                $"| Name:       | {AddSpaces(Name, 19)} |\n" +
+                $"| Price:      | {AddSpaces(Price.ToString("F2") + "$", 19)} |\n" +
+                $"| Weight:     | {AddSpaces(Weight.ToString("F3") + "kg", 19)} |\n" +
+                $"| BakingDate: | {AddSpaces(bakingDate.ToString(), 19)} |\n" +
+                $"| BakingTime: | {AddSpaces(bakingTime.ToString() + " time left: " + ((State == States.Baking) ? ((int)time).ToString() : "Done"), 19)} |\n" +
+                $"| FreshTime:  | {AddSpaces(freshTime.ToString() + " time left: " + (State != States.Spoiled ? ((int)(bakingTime + freshTime - time)).ToString() : "-"), 19)} |\n" +
+                $"| Status:     | {AddSpaces(State.ToString(), 19)} |\n" +
+                $" -----------------------------------\n" +
+                $"| Ingredients:                      |\n";
 
             for (int i = 1; i < Enum.GetValues(typeof(Ingredients)).Length; i++)
             {
                 if (ingredients.Contains((Ingredients)(i))) {
-                    text += $"\t{((Ingredients)(i)).ToString()}\n";
-                }
-                //!text += $"{i}: {ingredients[i]} - {ingredients[i].IsChoosen}\n";               
+                    text += $"| \t" + AddSpaces(((Ingredients)(i)).ToString(), 28 - "\t".Length) + " |\n";
+                }             
             }
-            /*
-            foreach(IngredientClass ingredient in ingredients)
-            {
-                if (ingredient.IsChoosen)
-                {
-                    text += $"\t{ingredient.Name}\n";
-                }
-            }
-             */
+            text += $" -----------------------------------\n";
+
             return text;
         }
     }
