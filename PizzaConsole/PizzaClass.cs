@@ -43,7 +43,7 @@ namespace PizzaConsole
             }
             set
             {
-                if (value <= 0 || value >= 10000)//!Regex.IsMatch( value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,2})?$") ||
+                if (value <= 0 || value >= 10000)
                 {
                     throw new ArgumentNullException(null, "Only numbers are allowed. The price must be greater than 0 and less than 10000");
                 }
@@ -59,7 +59,7 @@ namespace PizzaConsole
             }
             set
             {
-                if (value <= 0 || value >= 10)//!Regex.IsMatch(value.ToString(), @"^(0|[1-9]\d*)(\.\d{0,3})?$") ||
+                if (value <= 0 || value >= 10)
                 {
                     throw new ArgumentNullException(null, "Only numbers are allowed. The weight must be greater than 0 and less than 10");
                 }

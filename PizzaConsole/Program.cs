@@ -139,45 +139,11 @@ namespace PizzaConsole
                     Console.WriteLine(ex.Message);
                 }
             }
-            //name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
-            /*while (name.Length < 3 || name.Length > 12)
-            {
-                name =
-                //Console.WriteLine("Write from 3 to 12 characters. Only Latin letters are allowed");
-                //name = FormatAnswer("^[A-Za-z ]*$", "Write from 3 to 12 characters. Only Latin letters are allowed");
-            }*/
-            /*
-            
-            price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
-            while (price <= 0 || price >= 10000)
-            {
-                Console.WriteLine("Only numbers are allowed. The price must be greater than 0 and less than 10000");
-                price = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,2})?$", "Only numbers are allowed. The price must be greater than 0 and less than 10000"));
-            }
 
-            Console.WriteLine("Enter  weight:");
-            weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The price must be greater than 0"));
-            while (weight <= 0 || weight >= 10)
-            {
-                Console.WriteLine("Only numbers are allowed. The weight must be greater than 0 and less than 10");
-                weight = float.Parse(FormatAnswer(@"^(0|[1-9]\d*)(\.\d{0,3})?$", "Only numbers are allowed. The weight must be greater than 0 and less than 10"));
-            }
-
-            */
             ChooseIngredients(ref pizza);
             pizzas.Add(pizza);
             
             
-        }
-
-        static void ShowAll()
-        {
-            Console.WriteLine($"You have {pizzas.Count} pizzas");
-            for (int i = 0; i < pizzas.Count; i++)
-            {
-                Console.WriteLine($"{i}: {pizzas[i].Name}");
-                //Console.WriteLine($"{pizzas[i].Show}")
-            }
         }
 
         static void ShowAllDetailed()
@@ -371,11 +337,12 @@ namespace PizzaConsole
                 Console.WriteLine("Only numbers are allowed. The amount of money must be greater than 0.\nFormat: any digits before the decimal point, and up to 2 digits after it.");
             }
 
+            DrawMenu();
+
             while (true)
             {
                 try
                 {
-                    DrawMenu();
                     Console.WriteLine($"\nYou have {money.ToString("F2")}$\nEnter a number between 0-5");
 
                     command = int.Parse(Console.ReadLine());
@@ -388,7 +355,6 @@ namespace PizzaConsole
                             else throw new Exception("You have already reached the limit");
                             break;
                         case 2:
-                            //ShowAll();
                             ShowAllDetailed();
                             break;
                         case 3:
@@ -428,7 +394,6 @@ namespace PizzaConsole
                             {
                                 Console.WriteLine($"Nothing to buy");
                             }
-                            //ShowAllDetailed();
                             break;
                         case 5:
                             Delete();
@@ -437,6 +402,10 @@ namespace PizzaConsole
                             Console.WriteLine("Unknown command");
                             break;
                     }
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n// Menu omitted to save screen space");
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 }
                 catch (Exception ex)
                 {
